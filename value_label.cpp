@@ -165,6 +165,9 @@ void ValueLabel::setValue(double newValue)
     if (newValue < lopr)
         newValue = lopr;
 
+    currentValue = newValue;
+    refreshText();
+
     ((QEFloating *) getQcaItem(0))->writeFloatingElement(newValue);
 }
 

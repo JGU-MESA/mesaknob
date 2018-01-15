@@ -31,5 +31,5 @@ HEADERS  += \
 
 FORMS    +=
 
-INCLUDEPATH += /epics/epicsqt/qeframework/include
-LIBS += -L/epics/epicsqt/qeframework/lib/linux-x86_64 -lQEFramework
+INCLUDEPATH += qeframework/include
+LIBS += -Lqeframework/lib/linux-x86_64 -lQEFramework

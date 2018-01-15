@@ -54,6 +54,8 @@ KnobBox::KnobBox(QWidget *parent) :
     setOutputButton = new QECheckBox;
     setOutputButton->setCheckable(true);
     setOutputButton->setSubscribe(true);
+    setOutputButton->setClickText("OFF");
+    setOutputButton->setClickCheckedText("ON");
     setOutputButton->setText("Output");
     getOutputLabel = new QELabel;
     getValueLabel = new QEAnalogProgressBar;
