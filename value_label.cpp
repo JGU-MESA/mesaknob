@@ -4,7 +4,8 @@
 ValueLabel::ValueLabel( QWidget *parent ) :
     QLabel( parent ),
     QEWidget( this ),
-    QESingleVariableMethods ( this, 0 )
+    QESingleVariableMethods ( this, 0 ),
+    valid(false)
 {
     setup();
 }
@@ -69,8 +70,9 @@ void ValueLabel::connectionChanged( QCaConnectionInfo& connectionInfo, const uns
 
     if (!isConnected)
         currentValue = 0;
-    exponent = 0;
-    
+
+    valid = false;
+
     refreshText();
 }
 
@@ -98,38 +100,44 @@ void ValueLabel::shiftRight()
 
 void ValueLabel::updateText(const double &newValue, QCaAlarmInfo &, QCaDateTime &, const unsigned int &)
 {
+    if (!valid) {
+        // Determine the maximum number of digits before the decimal point.
+        // Algorithm might be suboptimal :)
+        QEFloating *qca = (QEFloating *) getQcaItem(0);
+        if (qca) {
+            hopr = qca->getDisplayLimitUpper();
+            lopr = qca->getDisplayLimitLower();
+            prec = qca->getPrecision();
+
+            int hoprDigits = 1;
+            double hopr2 = hopr;
+            while ((hopr2 /= 10) > 0.99)
+                ++hoprDigits;
+        
+            double lopr2 = lopr;    
+            if (lopr2 < 0)
+                lopr2 = -lopr2;
+            int loprDigits = 1;
+            while ((lopr2 /= 10) > 0.99)
+                ++loprDigits;
+        
+            digits = loprDigits > hoprDigits ? loprDigits : hoprDigits;
+            // highlight third digit by default
+            exponent = digits - 3;
+            if (exponent < -prec)
+                exponent = -prec;
+        }
+        valid = true;
+    }
+
     currentValue = newValue;
     refreshText();
 }
 
-void ValueLabel::refreshText()
+QString ValueLabel::formatNumber(bool richText, bool unit)
 {
     if (!isConnected) {
-        setText("no PV");
-        return;
-    }
-
-    // Determine the maximum number of digits before the decimal point.
-    // Algorithm might be suboptimal :)
-    QEFloating *qca = (QEFloating *) getQcaItem(0);
-    if (qca) {
-        hopr = qca->getDisplayLimitUpper();
-        lopr = qca->getDisplayLimitLower();
-        prec = qca->getPrecision();
-
-        int hoprDigits = 1;
-        double hopr2 = hopr;
-        while ((hopr2 /= 10) > 0.99)
-            ++hoprDigits;
-        
-        double lopr2 = lopr;    
-        if (lopr2 < 0)
-            lopr2 = -lopr2;
-        int loprDigits = 1;
-        while ((lopr2 /= 10) > 0.99)
-            ++loprDigits;
-    
-        digits = loprDigits > hoprDigits ? loprDigits : hoprDigits;
+        return QString("no PV");
     }
 
     char sign = '+';
@@ -145,21 +153,30 @@ void ValueLabel::refreshText()
     else
         numberString = QString("%1%2").arg(sign).arg(displayValue, digits, 'f', prec, '0');
 
-    int cursorPosition = digits - exponent;
-    if (exponent < 0)
-        ++cursorPosition;
-    QString s1("<span style=\"background-color: #88ff88;\">");
-    QString s2("</span>");
-    
-    numberString.insert(cursorPosition, s1);
-    numberString.insert(cursorPosition + s1.size() + 1, s2);
+    if (richText) {
+        int cursorPosition = digits - exponent;
+        if (exponent < 0)
+            ++cursorPosition;
+        QString s1("<span style=\"background-color: #88ff88;\">");
+        QString s2("</span>");
+        
+        numberString.insert(cursorPosition, s1);
+        numberString.insert(cursorPosition + s1.size() + 1, s2);
+    }
 
-    setText(numberString.append(" ").append(((QEFloating *) getQcaItem(0))->getEgu()));
+    if (unit)
+        numberString.append(" ").append(((QEFloating *) getQcaItem(0))->getEgu());
+
+    return numberString;
+}
+
+void ValueLabel::refreshText()
+{
+    setText(formatNumber(true, true));
 }
 
 void ValueLabel::setValue(double newValue)
 {
-    qDebug() << newValue << hopr << lopr;
     if (newValue > hopr)
         newValue = hopr;
     if (newValue < lopr)

@@ -11,8 +11,19 @@
 #include <QtWidgets>
 #include <QDebug>
 
+QColor KnobBox::buttonColor(bool pressed, int id)
+{
+    switch (id) {
+        case 0: return pressed ? QColor(255, 0, 0) : QColor(255, 230, 230);
+        case 1: return pressed ? QColor(0, 255, 0) : QColor(230, 255, 230);
+        case 2: return pressed ? QColor(0, 0, 255) : QColor(230, 230, 255);
+        case 3: return pressed ? QColor(255, 255, 0) : QColor(255, 255, 230);
+        default: return Qt::white;
+    }
+}
+
 KnobBox::KnobBox(QWidget *parent) :
-    QFrame(parent), knob(0)
+    QFrame(parent), savedValue(0), toggleValue(0), knob(0)
 {
     setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
 
@@ -70,15 +81,31 @@ KnobBox::KnobBox(QWidget *parent) :
     for (int i = 0; i < knobManager->getKnobCount(); ++i) {
         QPushButton *button = new QPushButton(QString::number(i));
         button->setCheckable(true);
+        QPalette p = button->palette();
+        p.setColor(QPalette::Active, QPalette::Button, buttonColor(false, i));
+        button->setPalette(p);
         connect(button, &QPushButton::toggled, this, &KnobBox::knobButtonToggled);
         knobButtons.append(button);
         assignKnobLayout->addWidget(button);
     }
 
+    saveButton = new QPushButton("Save");
+    connect(saveButton, &QPushButton::clicked, this, &KnobBox::saveClicked);
+    recallButton = new QPushButton("Recall\n---");
+    connect(recallButton, &QPushButton::clicked, this, &KnobBox::recallClicked);
+    toggleButton = new QPushButton("Toggle\n---");
+    connect(toggleButton, &QPushButton::clicked, this, &KnobBox::toggleClicked);
+
+    QHBoxLayout *saveRecallLayout = new QHBoxLayout;
+    saveRecallLayout->addWidget(saveButton);
+    saveRecallLayout->addWidget(recallButton);
+    saveRecallLayout->addWidget(toggleButton);
+
     QVBoxLayout *completeLayout = new QVBoxLayout;
     completeLayout->addLayout(variableSelectionLayout);
     completeLayout->addLayout(setValueLayout);
     completeLayout->addLayout(miscLayout);
+    completeLayout->addLayout(saveRecallLayout);
     completeLayout->addLayout(assignKnobLayout);
 
     setLayout(completeLayout);
@@ -149,6 +176,10 @@ void KnobBox::pvSelected(int index)
         getValueLabel->setVariableNameProperty(pv.getGetValuePvName());
         enableControls();
     }
+    savedValue = 0;
+    recallButton->setText("Recall\n---");
+    toggleValue = 0;
+    toggleButton->setText("Toggle\n---");
     previousPvButton->setEnabled(index > 0);
     nextPvButton->setEnabled(index < pvList->getItems().size());
 }
@@ -156,6 +187,10 @@ void KnobBox::pvSelected(int index)
 void KnobBox::knobButtonToggled()
 {
     QPushButton *button = static_cast<QPushButton *>(sender());
+    QPalette p = button->palette();
+    p.setColor(QPalette::Active, QPalette::Button, buttonColor(button->isChecked(), button->text().toInt()));
+    button->setPalette(p);
+        
     if (button->isChecked()) {
         if (knob)
             unassignKnob();
@@ -200,4 +235,25 @@ void KnobBox::knobRotated(int delta, bool pressed)
             setValueBox->shiftLeft();
     } else
         setValueBox->setValue(setValueBox->getCurrentValue() + delta * pow(10, setValueBox->getExponent()));
+}
+
+void KnobBox::saveClicked()
+{
+    savedValue = setValueBox->getCurrentValue();
+    recallButton->setText(QString("Recall\n%1").arg(setValueBox->formatNumber(false, false)));
+    toggleValue = setValueBox->getCurrentValue();
+    toggleButton->setText(QString("Toggle\n%1").arg(setValueBox->formatNumber(false, false)));
+}
+
+void KnobBox::recallClicked()
+{
+    setValueBox->setValue(savedValue);
+}
+
+void KnobBox::toggleClicked()
+{
+    double currentValue = setValueBox->getCurrentValue();
+    toggleButton->setText(QString("Toggle\n%1").arg(setValueBox->formatNumber(false, false)));
+    setValueBox->setValue(toggleValue);
+    toggleValue = currentValue;
 }

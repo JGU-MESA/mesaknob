@@ -19,6 +19,7 @@ public:
     void setExponent(int _exponent);
     void setValue(double newValue);
     double getCurrentValue() const { return currentValue; }
+    QString formatNumber(bool richText, bool unit);
 signals:
     void requestResend();
 protected:
@@ -28,6 +29,7 @@ protected:
     double lopr;
     int digits;
     int prec;
+    bool valid;
     QEFloatingFormatting floatingFormatting;
     void refreshText();
 private:

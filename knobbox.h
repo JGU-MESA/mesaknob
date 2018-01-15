@@ -3,6 +3,7 @@
 
 #include <QFrame>
 #include <QList>
+#include <QColor>
 
 class Knob;
 class QPushButton;
@@ -20,7 +21,8 @@ class KnobBox : public QFrame
 public:
     explicit KnobBox(QWidget *parent = 0);
     ~KnobBox();
-
+protected:
+    QColor buttonColor(bool pressed, int id);
 private slots:
     void knobButtonToggled();
     void assignKnob();
@@ -32,6 +34,13 @@ private slots:
     void enableControls();
     void pvSelected(int index);
     void knobRotated(int delta, bool pressed);
+
+    void saveClicked();
+    void recallClicked();
+    void toggleClicked();
+protected:
+    double savedValue;
+    double toggleValue;
 private:
     Knob *knob;
     QPushButton *previousPvButton;
@@ -46,6 +55,10 @@ private:
     QPushButton *shiftLeftButton;
     QPushButton *shiftRightButton;
     ValueLabel *setValueBox;
+
+    QPushButton *saveButton;
+    QPushButton *recallButton;
+    QPushButton *toggleButton;
 
     void attachKnob();
     void detachKnob();
