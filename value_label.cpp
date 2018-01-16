@@ -100,6 +100,8 @@ void ValueLabel::shiftRight()
 
 void ValueLabel::updateText(const double &newValue, QCaAlarmInfo &, QCaDateTime &, const unsigned int &)
 {
+    currentValue = newValue;
+
     if (!valid) {
         // Determine the maximum number of digits before the decimal point.
         // Algorithm might be suboptimal :)
@@ -126,11 +128,12 @@ void ValueLabel::updateText(const double &newValue, QCaAlarmInfo &, QCaDateTime 
             exponent = digits - 3;
             if (exponent < -prec)
                 exponent = -prec;
+
+            valid = true;
+            emit dataValid();
         }
-        valid = true;
     }
 
-    currentValue = newValue;
     refreshText();
 }
 

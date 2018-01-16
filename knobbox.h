@@ -11,6 +11,7 @@ class QEPushButton;
 class QECheckBox;
 class QEAnalogProgressBar;
 class QELabel;
+class QESimpleShape;
 class QComboBox;
 class ValueLabel;
 
@@ -48,7 +49,7 @@ private:
     QComboBox *variableSelection;
     
     QECheckBox *setOutputButton;
-    QELabel *getOutputLabel;
+    QESimpleShape *getOutputLed;
     QEAnalogProgressBar *getValueLabel;
 
     QList<QPushButton *> knobButtons;

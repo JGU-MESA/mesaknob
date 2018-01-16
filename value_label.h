@@ -22,6 +22,7 @@ public:
     QString formatNumber(bool richText, bool unit);
 signals:
     void requestResend();
+    void dataValid();
 protected:
     double currentValue;
     int exponent;

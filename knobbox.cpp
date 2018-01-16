@@ -8,6 +8,7 @@
 #include <QEAnalogProgressBar.h>
 #include <QEPushButton.h>
 #include <QECheckBox.h>
+#include <QESimpleShape.h>
 #include <QtWidgets>
 #include <QDebug>
 
@@ -52,6 +53,7 @@ KnobBox::KnobBox(QWidget *parent) :
     valueBoxFont.setWeight(QFont::Bold);
     valueBoxFont.setFamily("Monospace");
     setValueBox->setFont(valueBoxFont);
+    connect(setValueBox, &ValueLabel::dataValid, this, &KnobBox::saveClicked);
     shiftRightButton = new QPushButton("/ 10");
     shiftRightButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
     connect(shiftLeftButton, SIGNAL(clicked()), setValueBox, SLOT(shiftLeft()));
@@ -68,13 +70,18 @@ KnobBox::KnobBox(QWidget *parent) :
     setOutputButton->setClickText("OFF");
     setOutputButton->setClickCheckedText("ON");
     setOutputButton->setText("Output");
-    getOutputLabel = new QELabel;
+    getOutputLed = new QESimpleShape;
+    getOutputLed->setDisplayAlarmStateOptionProperty(QESimpleShape::Never);
+    getOutputLed->setTextFormat(QSimpleShape::PvText);
+    getOutputLed->setShape(QSimpleShape::rectangle);
+    getOutputLed->setColour0Property(Qt::gray);
+    getOutputLed->setColour1Property(Qt::green);
     getValueLabel = new QEAnalogProgressBar;
     getValueLabel->setUseDbDisplayLimits(true);
     
     QHBoxLayout *miscLayout = new QHBoxLayout;
     miscLayout->addWidget(setOutputButton);
-    miscLayout->addWidget(getOutputLabel);
+    miscLayout->addWidget(getOutputLed);
     miscLayout->addWidget(getValueLabel);
 
     QHBoxLayout *assignKnobLayout = new QHBoxLayout;
@@ -83,17 +90,22 @@ KnobBox::KnobBox(QWidget *parent) :
         button->setCheckable(true);
         QPalette p = button->palette();
         p.setColor(QPalette::Active, QPalette::Button, buttonColor(false, i));
+        p.setColor(QPalette::Inactive, QPalette::Button, buttonColor(false, i));
         button->setPalette(p);
+        button->setMinimumHeight(40);
         connect(button, &QPushButton::toggled, this, &KnobBox::knobButtonToggled);
         knobButtons.append(button);
         assignKnobLayout->addWidget(button);
     }
 
     saveButton = new QPushButton("Save");
+    saveButton->setMinimumHeight(40);
     connect(saveButton, &QPushButton::clicked, this, &KnobBox::saveClicked);
     recallButton = new QPushButton("Recall\n---");
+    recallButton->setMinimumHeight(40);
     connect(recallButton, &QPushButton::clicked, this, &KnobBox::recallClicked);
     toggleButton = new QPushButton("Toggle\n---");
+    toggleButton->setMinimumHeight(40);
     connect(toggleButton, &QPushButton::clicked, this, &KnobBox::toggleClicked);
 
     QHBoxLayout *saveRecallLayout = new QHBoxLayout;
@@ -123,7 +135,7 @@ void KnobBox::disableControls()
     shiftRightButton->setEnabled(false);
     setValueBox->setEnabled(false);
     setOutputButton->setEnabled(false);
-    getOutputLabel->setEnabled(false);
+    getOutputLed->setEnabled(false);
     getValueLabel->setEnabled(false);
 }
 
@@ -133,7 +145,7 @@ void KnobBox::enableControls()
     shiftRightButton->setEnabled(true);
     setValueBox->setEnabled(true);
     setOutputButton->setEnabled(true);
-    getOutputLabel->setEnabled(true);
+    getOutputLed->setEnabled(true);
     getValueLabel->setEnabled(true);
 }
 
@@ -165,14 +177,14 @@ void KnobBox::pvSelected(int index)
     if (index <= 0) {
         setValueBox->setVariableNameProperty(QString());
         setOutputButton->setVariableNameProperty(QString());
-        getOutputLabel->setVariableNameProperty(QString());
+        getOutputLed->setVariableNameProperty(QString());
         getValueLabel->setVariableNameProperty(QString());
         disableControls();
     } else {
         const Pv &pv = pvList->getItems().at(index - 1);
         setValueBox->setVariableNameProperty(pv.getSetValuePvName());
         setOutputButton->setVariableNameProperty(pv.getSetOutputPvName());
-        getOutputLabel->setVariableNameProperty(pv.getGetOutputPvName());
+        getOutputLed->setVariableNameProperty(pv.getGetOutputPvName());
         getValueLabel->setVariableNameProperty(pv.getGetValuePvName());
         enableControls();
     }
@@ -189,6 +201,7 @@ void KnobBox::knobButtonToggled()
     QPushButton *button = static_cast<QPushButton *>(sender());
     QPalette p = button->palette();
     p.setColor(QPalette::Active, QPalette::Button, buttonColor(button->isChecked(), button->text().toInt()));
+    p.setColor(QPalette::Inactive, QPalette::Button, buttonColor(button->isChecked(), button->text().toInt()));
     button->setPalette(p);
         
     if (button->isChecked()) {
