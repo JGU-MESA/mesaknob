@@ -180,6 +180,9 @@ void ValueLabel::refreshText()
 
 void ValueLabel::setValue(double newValue)
 {
+    if (!isConnected)
+        return;
+    
     if (newValue > hopr)
         newValue = hopr;
     if (newValue < lopr)
@@ -188,6 +191,8 @@ void ValueLabel::setValue(double newValue)
     currentValue = newValue;
     refreshText();
 
-    ((QEFloating *) getQcaItem(0))->writeFloatingElement(newValue);
+    QEFloating *qca = (QEFloating *) getQcaItem(0);
+    if (qca)
+        qca->writeFloatingElement(newValue);
 }
 
