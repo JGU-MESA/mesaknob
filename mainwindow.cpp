@@ -10,10 +10,13 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     QGridLayout *mainLayout = new QGridLayout;
     for (int row = 0; row < 4; ++row) {
-        mainLayout->addWidget(new KnobBox, row, 0);
-        mainLayout->addWidget(new KnobBox, row, 1);
-        mainLayout->addWidget(new KnobBox, row, 3);
-        mainLayout->addWidget(new KnobBox, row, 4);
+        for (int col = 0; col < 5; ++col) {
+            if (col == 2)
+                ++col;
+            KnobBox *knobBox = new KnobBox;
+            knobBoxes.append(knobBox);
+            mainLayout->addWidget(knobBox, row, col);
+        }
     }
     QFrame *separator = new QFrame;
     separator->setLineWidth(2);
@@ -47,9 +50,13 @@ MainWindow::~MainWindow()
 
 void MainWindow::saveAll()
 {
+    for (QList<KnobBox *>::const_iterator i = knobBoxes.cbegin(); i != knobBoxes.cend(); ++i)
+        (*i)->saveClicked();
 }
 
 void MainWindow::recallAll()
 {
+    for (QList<KnobBox *>::const_iterator i = knobBoxes.cbegin(); i != knobBoxes.cend(); ++i)
+        (*i)->recallClicked();
 }
 

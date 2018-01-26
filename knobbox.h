@@ -35,7 +35,7 @@ private slots:
     void enableControls();
     void pvSelected(int index);
     void knobRotated(int delta, bool pressed);
-
+public slots:
     void saveClicked();
     void recallClicked();
     void toggleClicked();
