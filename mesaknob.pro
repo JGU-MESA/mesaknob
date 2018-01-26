@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     knobbox.cpp \
     mainwindow.cpp \
     pv_list.cpp \
-    value_label.cpp
+    value_label.cpp \
+    config_list.cpp
 
 HEADERS  += \
     powermate.h \
@@ -27,7 +28,8 @@ HEADERS  += \
     knobbox.h \
     mainwindow.h \
     pv_list.h \
-    value_label.h
+    value_label.h \
+    config_list.h
 
 FORMS    +=
 

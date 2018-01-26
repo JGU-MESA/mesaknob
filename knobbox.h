@@ -22,6 +22,8 @@ class KnobBox : public QFrame
 public:
     explicit KnobBox(QWidget *parent = 0);
     ~KnobBox();
+    QString getPV() const;
+    void setPV(const QString &_pv);
 protected:
     QColor buttonColor(bool pressed, int id);
 private slots:

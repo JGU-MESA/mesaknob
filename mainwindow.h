@@ -20,6 +20,7 @@ private:
 private slots:
 	void saveAll();
 	void recallAll();
+	void manageConfigurationSets();
 };
 
 #endif // MainWindow_H

@@ -4,6 +4,7 @@
 #include "knobbox.h"
 #include "powermate.h"
 #include "main.h"
+#include "config_list.h"
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent)
@@ -27,6 +28,9 @@ MainWindow::MainWindow(QWidget *parent) :
     centralWidget->setLayout(mainLayout);
     setCentralWidget(centralWidget);
 
+    QAction *actManageConfigurationSets = new QAction(tr("&Manage configuration sets"));
+    actManageConfigurationSets->setShortcut(QKeySequence("Ctrl+M"));
+    connect(actManageConfigurationSets, &QAction::triggered, this, &MainWindow::manageConfigurationSets);
     QAction *actSaveAll = new QAction(tr("&Save all"));
     actSaveAll->setShortcut(QKeySequence("Ctrl+S"));
     connect(actSaveAll, &QAction::triggered, this, &MainWindow::saveAll);
@@ -38,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(actExit, &QAction::triggered, this, &QWidget::close);
     
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->addAction(actManageConfigurationSets);
+    fileMenu->addSeparator();
     fileMenu->addAction(actSaveAll);
     fileMenu->addAction(actRecallAll);
     fileMenu->addSeparator();
@@ -46,6 +52,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+}
+
+void MainWindow::manageConfigurationSets()
+{
+    ConfigList dlg(knobBoxes, this);
+    dlg.exec();
 }
 
 void MainWindow::saveAll()
