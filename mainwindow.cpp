@@ -9,9 +9,16 @@ MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent)
 {
     QGridLayout *mainLayout = new QGridLayout;
-    for (int i = 0; i < 4; ++i)
-        for (int j = 0; j < 4; ++j)
-            mainLayout->addWidget(new KnobBox, i, j);
+    for (int row = 0; row < 4; ++row) {
+        mainLayout->addWidget(new KnobBox, row, 0);
+        mainLayout->addWidget(new KnobBox, row, 1);
+        mainLayout->addWidget(new KnobBox, row, 3);
+        mainLayout->addWidget(new KnobBox, row, 4);
+    }
+    QFrame *separator = new QFrame;
+    separator->setLineWidth(2);
+    separator->setFrameShape(QFrame::VLine);
+    mainLayout->addWidget(separator, 0, 2, 4, 1);
 
     QWidget *centralWidget = new QWidget;
     centralWidget->setLayout(mainLayout);

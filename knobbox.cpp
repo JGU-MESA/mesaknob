@@ -34,6 +34,10 @@ KnobBox::KnobBox(QWidget *parent) :
     connect(nextPvButton, SIGNAL(clicked()), this, SLOT(nextPv()));
 
     variableSelection = new QComboBox;
+    QFont variableSelectionFont;
+//    variableSelectionFont.setPointSize(14);
+    variableSelectionFont.setWeight(QFont::Bold);
+    variableSelection->setFont(variableSelectionFont);
     variableSelection->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
     updatePvList();
     connect(pvList, &PvList::contentsChanged, this, &KnobBox::updatePvList);
