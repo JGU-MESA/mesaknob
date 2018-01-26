@@ -59,6 +59,7 @@ void ConfigList::loadClicked()
         if ((id >= 0) && (id < knobList.size()))
             knobList[id]->setPV(pv);
     }
+    accept();
 }
 
 void ConfigList::saveClicked()
