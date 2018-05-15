@@ -133,6 +133,25 @@ KnobBox::~KnobBox()
 
 }
 
+QString KnobBox::getPV() const
+{
+    if (!variableSelection->currentIndex())
+        return QString();
+    const Pv &pv = pvList->getItems().at(variableSelection->currentIndex() - 1);
+    return pv.getScreenName();
+}
+
+void KnobBox::setPV(const QString &_pv)
+{
+    const QList<Pv> &list = pvList->getItems();
+    for (int i = 0; i < list.size(); ++i)
+        if (list[i].getScreenName() == _pv) {
+            variableSelection->setCurrentIndex(i + 1);
+            return;
+        }
+    variableSelection->setCurrentIndex(0);
+}
+
 void KnobBox::disableControls()
 {
     shiftLeftButton->setEnabled(false);

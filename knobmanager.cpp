@@ -7,22 +7,23 @@
 KnobManager::KnobManager(QObject *parent)
 	: QObject(parent)
 {
-	const int size = settings->beginReadArray("powermate/devices");
-	for (int i = 0; i < size; ++i) {
-		settings->setArrayIndex(i);
+    const int size = settings->beginReadArray("powermate/devices");
+    for (int i = 0; i < size; ++i) {
+        settings->setArrayIndex(i);
         PowerMate *powerMate = new PowerMate(i, settings->value("path").toString());
-		powerMate->startLoopThread();
+        powerMate->startLoopThread();
         powerMate->deactivate();
 
-		knobs.append(powerMate);
-	}
+        knobs.append(powerMate);
+    }
+    settings->endArray();
 }
 
 Knob *KnobManager::registerKnob(int knobId)
 {
-	Knob *knob = knobs.at(knobId);
+    Knob *knob = knobs.at(knobId);
     knob->unassign();
     knob->activate();
-	return knob;
+    return knob;
 }
 
