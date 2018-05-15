@@ -190,6 +190,7 @@ void KnobBox::updatePvList()
     const QList<Pv> &items = pvList->getItems();
     for (QList<Pv>::const_iterator i = items.constBegin(); i != items.constEnd(); ++i) {
         variableSelection->addItem(i->getScreenName());
+        variableSelection->setItemData(variableSelection->count() - 1, i->getColor(), Qt::BackgroundRole);
     }
     previousPvButton->setEnabled(false);
     nextPvButton->setEnabled(true);
@@ -202,6 +203,10 @@ void KnobBox::pvSelected(int index)
         setOutputButton->setVariableNameProperty(QString());
         getOutputLed->setVariableNameProperty(QString());
         getValueLabel->setVariableNameProperty(QString());
+        
+        QPalette p;
+        variableSelection->setPalette(p);
+
         disableControls();
     } else {
         const Pv &pv = pvList->getItems().at(index - 1);
@@ -209,6 +214,12 @@ void KnobBox::pvSelected(int index)
         setOutputButton->setVariableNameProperty(pv.getSetOutputPvName());
         getOutputLed->setVariableNameProperty(pv.getGetOutputPvName());
         getValueLabel->setVariableNameProperty(pv.getGetValuePvName());
+        
+        QPalette p = variableSelection->palette();
+        p.setColor(QPalette::Active, QPalette::Button, pv.getColor());
+        p.setColor(QPalette::Inactive, QPalette::Button, pv.getColor());
+        variableSelection->setPalette(p);
+
         enableControls();
     }
     savedValue = 0;
