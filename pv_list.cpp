@@ -40,5 +40,9 @@ PvList::PvList(QObject *parent)
     items.append(Pv("melba_050:trip_q3:i_set", "melba_050:trip_q3:i_get", "melba_050:trip_q3:on_set", "melba_050:trip_q3:on_get", "melba_050:trip_q3", "Irgendein Steerer", Qt::green));
     items.append(Pv("melba_060:sv:i_set", "melba_060:sv:i_get", "melba_060:sv:on_set", "melba_060:sv:on_get", "melba_060:sv", "Irgendein Steerer", Qt::red));
     items.append(Pv("melba_060:sh:i_set", "melba_060:sh:i_get", "melba_060:sh:on_set", "melba_060:sh:on_get", "melba_060:sh", "Irgendein Steerer", Qt::red));
+
+    items.append(Pv("phaseshift1:stepper:MoveAbsolute", "phaseshift1:stepper:CurrentPosition", "", "phaseshift1:stepper:Running", "phaseshift1:stepper", "Bla", Qt::cyan));
+    items.append(Pv("phaseshift2:stepper:MoveAbsolute", "phaseshift2:stepper:CurrentPosition", "", "phaseshift2:stepper:Running", "phaseshift2:stepper", "Bla", Qt::cyan));
+    items.append(Pv("spr:stepper1:MoveAbsolute",        "spr:stepper1:CurrentPosition",        "", "spr:stepper1:Running",        "spr:stepper1",        "Bla", Qt::cyan));
 }
 

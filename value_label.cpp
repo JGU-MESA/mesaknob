@@ -183,10 +183,12 @@ void ValueLabel::setValue(double newValue)
     if (!isConnected)
         return;
     
-    if (newValue > hopr)
-        newValue = hopr;
-    if (newValue < lopr)
-        newValue = lopr;
+    if ((hopr != 0) || (lopr != 0)) {
+        if (newValue > hopr)
+            newValue = hopr;
+        if (newValue < lopr)
+            newValue = lopr;
+    }
 
     currentValue = newValue;
     refreshText();
