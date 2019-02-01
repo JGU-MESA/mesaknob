@@ -15,7 +15,9 @@ TEMPLATE = app
 SOURCES += main.cpp\
     powermate.cpp \
     knobmanager.cpp \
+    knob.cpp \
     knobbox.cpp \
+    knob_selection_button.cpp \
     mainwindow.cpp \
     pv_list.cpp \
     value_label.cpp \
@@ -26,6 +28,7 @@ HEADERS  += \
     knobmanager.h \
     knob.h \
     knobbox.h \
+    knob_selection_button.h \
     mainwindow.h \
     pv_list.h \
     value_label.h \

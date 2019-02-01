@@ -2,6 +2,7 @@
 #include "main.h"
 #include "knob.h"
 #include "knobmanager.h"
+#include "knob_selection_button.h"
 #include "pv_list.h"
 #include "value_label.h"
 #include <QELabel.h>
@@ -11,17 +12,6 @@
 #include <QESimpleShape.h>
 #include <QtWidgets>
 #include <QDebug>
-
-QColor KnobBox::buttonColor(bool pressed, int id)
-{
-    switch (id) {
-        case 0: return pressed ? QColor(255, 0, 0) : QColor(255, 230, 230);
-        case 1: return pressed ? QColor(0, 255, 0) : QColor(230, 255, 230);
-        case 2: return pressed ? QColor(0, 0, 255) : QColor(230, 230, 255);
-        case 3: return pressed ? QColor(255, 255, 0) : QColor(255, 255, 230);
-        default: return Qt::white;
-    }
-}
 
 KnobBox::KnobBox(QWidget *parent) :
     QFrame(parent), savedValue(0), toggleValue(0), knob(0)
@@ -90,12 +80,7 @@ KnobBox::KnobBox(QWidget *parent) :
 
     QHBoxLayout *assignKnobLayout = new QHBoxLayout;
     for (int i = 0; i < knobManager->getKnobCount(); ++i) {
-        QPushButton *button = new QPushButton(QString::number(i));
-        button->setCheckable(true);
-        QPalette p = button->palette();
-        p.setColor(QPalette::Active, QPalette::Button, buttonColor(false, i));
-        p.setColor(QPalette::Inactive, QPalette::Button, buttonColor(false, i));
-        button->setPalette(p);
+        QPushButton *button = new KnobSelectionButton(i);
         button->setMinimumHeight(40);
         connect(button, &QPushButton::toggled, this, &KnobBox::knobButtonToggled);
         knobButtons.append(button);
@@ -232,24 +217,23 @@ void KnobBox::pvSelected(int index)
 
 void KnobBox::knobButtonToggled()
 {
-    QPushButton *button = static_cast<QPushButton *>(sender());
-    QPalette p = button->palette();
-    p.setColor(QPalette::Active, QPalette::Button, buttonColor(button->isChecked(), button->text().toInt()));
-    p.setColor(QPalette::Inactive, QPalette::Button, buttonColor(button->isChecked(), button->text().toInt()));
-    button->setPalette(p);
+    KnobSelectionButton *button = static_cast<KnobSelectionButton *>(sender());
         
     if (button->isChecked()) {
         if (knob)
             unassignKnob();
-        assignKnob();
+        assignKnob(button->getCumulativeSelection());
     } else
         detachKnob();
 }
 
-void KnobBox::assignKnob()
+void KnobBox::assignKnob(bool cumulativeSelection)
 {
     qDebug() << "assignKnob";
-    knob = knobManager->registerKnob(static_cast<QPushButton *>(sender())->text().toInt());
+    knob = knobManager->getKnob(static_cast<KnobSelectionButton *>(sender())->getId());
+    if (!cumulativeSelection)
+        knob->unassign();
+    knob->addClient();
     attachKnob();
 }
 
@@ -262,14 +246,16 @@ void KnobBox::attachKnob()
 
 void KnobBox::unassignKnob()
 {
+    qDebug() << "unassignKnob";
     knobButtons.at(knob->getId())->setChecked(false);
 }
 
 void KnobBox::detachKnob()
 {
+    qDebug() << "detachKnob";
     disconnect(knob, &Knob::unassignKnob, this, &KnobBox::unassignKnob);
     disconnect(knob, &Knob::knobRotated, this, &KnobBox::knobRotated);
-    knob->deactivate();
+    knob->removeClient();
     knob = 0;
 }
 

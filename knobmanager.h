@@ -11,13 +11,13 @@
 class Knob;
 
 class KnobManager : public QObject {
-	Q_OBJECT
+    Q_OBJECT
 protected:
-	QList<Knob *> knobs;
+    QList<Knob *> knobs;
 public:
-	KnobManager(QObject *parent = 0);
-	int getKnobCount() const { return knobs.size(); }
-	Knob *registerKnob(int knobId);
+    KnobManager(QObject *parent = 0);
+    int getKnobCount() const { return knobs.size(); }
+    Knob *getKnob(int knobId);
 signals:
     void detachKnob(int knobId);
 };

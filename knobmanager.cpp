@@ -1,6 +1,5 @@
 #include "knobmanager.h"
 #include <QSettings>
-#include <QThread>
 #include "powermate.h"
 #include "main.h"
 
@@ -19,11 +18,8 @@ KnobManager::KnobManager(QObject *parent)
     settings->endArray();
 }
 
-Knob *KnobManager::registerKnob(int knobId)
+Knob *KnobManager::getKnob(int knobId)
 {
-    Knob *knob = knobs.at(knobId);
-    knob->unassign();
-    knob->activate();
-    return knob;
+    return knobs.at(knobId);
 }
 

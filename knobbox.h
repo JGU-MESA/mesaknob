@@ -24,11 +24,9 @@ public:
     ~KnobBox();
     QString getPV() const;
     void setPV(const QString &_pv);
-protected:
-    QColor buttonColor(bool pressed, int id);
 private slots:
     void knobButtonToggled();
-    void assignKnob();
+    void assignKnob(bool cumulativeSelection);
     void unassignKnob();
     void previousPv();
     void nextPv();
