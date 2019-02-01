@@ -34,4 +34,4 @@ HEADERS  += \
 FORMS    +=
 
 INCLUDEPATH += qeframework/include
-LIBS += -Lqeframework/lib/linux-x86_64 -lQEFramework
+LIBS += -Lqeframework/lib/linux-x86_64 -lQEFramework -lm

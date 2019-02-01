@@ -1,5 +1,6 @@
 #include "value_label.h"
 #include <QEFloating.h>
+#include <math.h>
 
 ValueLabel::ValueLabel( QWidget *parent ) :
     QLabel( parent ),
@@ -111,19 +112,13 @@ void ValueLabel::updateText(const double &newValue, QCaAlarmInfo &, QCaDateTime 
             lopr = qca->getDisplayLimitLower();
             prec = qca->getPrecision();
 
-            int hoprDigits = 1;
-            double hopr2 = hopr;
-            while ((hopr2 /= 10) > 0.99)
-                ++hoprDigits;
-        
-            double lopr2 = lopr;    
-            if (lopr2 < 0)
-                lopr2 = -lopr2;
-            int loprDigits = 1;
-            while ((lopr2 /= 10) > 0.99)
-                ++loprDigits;
-        
+            int hoprDigits = log10(fabs(hopr)) + 1;
+            int loprDigits = log10(fabs(lopr)) + 1;
+            int currentValueDigits = log10(fabs(currentValue)) + 1;
             digits = loprDigits > hoprDigits ? loprDigits : hoprDigits;
+            digits = digits > currentValueDigits ? digits : currentValueDigits;
+            if (digits < 1)
+                digits = 1;
             // highlight third digit by default
             exponent = digits - 3;
             if (exponent < -prec)
